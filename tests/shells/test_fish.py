@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+from thefuck.const import ARGUMENT_PLACEHOLDER
 from thefuck.shells import Fish
 
 
@@ -28,8 +29,9 @@ class TestFish(object):
         ('THEFUCK_OVERRIDDEN_ALIASES', '\ncut,\n\ngit,\tsed\r')])
     def test_get_overridden_aliases(self, shell, os_environ, key, value):
         os_environ[key] = value
-        assert shell._get_overridden_aliases() == {'cd', 'cut', 'git', 'grep',
-                                                   'ls', 'man', 'open', 'sed'}
+        overridden = shell._get_overridden_aliases()
+        assert set(overridden) == {'cd', 'cut', 'git', 'grep',
+                                   'ls', 'man', 'open', 'sed'}
 
     @pytest.mark.parametrize('before, after', [
         ('cd', 'cd'),
@@ -81,6 +83,7 @@ class TestFish(object):
         assert 'TF_SHELL=fish' in shell.app_alias('fuck')
         assert 'TF_ALIAS=fuck PYTHONIOENCODING' in shell.app_alias('fuck')
         assert 'PYTHONIOENCODING=utf-8 thefuck' in shell.app_alias('fuck')
+        assert ARGUMENT_PLACEHOLDER in shell.app_alias('fuck')
 
     def test_app_alias_alter_history(self, settings, shell):
         settings.alter_history = True
